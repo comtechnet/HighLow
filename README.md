@@ -1,68 +1,68 @@
-# `near-sdk-as` Starter Kit
+# `HighLow is a Near Card Game / It is sourced originally from the near-sdk-as` Starter Kit
 
-This is a good project to use as a starting point for your AssemblyScript project.
+This project is a AssemblyScript project for the Near blockchain.
 
-## Samples
+HighLow is a simple card game derived from an old English card game, which itself
+is derived from "snap".  Game series is 1 or more decks of ammended playing cards
+with ace,2,3,4,5,6,7,8,9,10,Jack,Queen,King,Joker (each card deck has 4 jokers also),
+having a card value of 1 through 14 respectively.
+Game series is funded by the house with X $.
 
-This repository includes a complete project structure for AssemblyScript contracts targeting the NEAR platform.
+Each series game "play" instance requires a minimum bet amount by the player.
+Game starts with createGame and the required minimum bet.  Game play can be blind.
+Game continues through two rounds and then ends with endGame
+Round 1 is played as a random card is turned over from the deck "shuttle"
 
-The example here is very basic.  It's a simple contract demonstrating the following concepts:
-- a single contract
-- the difference between `view` vs. `change` methods
-- basic contract storage
+Player then places a Round 2 bet (subject to maximum betting rules) along with a 
+guess/option declaring the player's belief of the 2nd card's relative value to the 1st card
+turned over from the card deck "shuttle", stating "Higher" or "Lower" than the 1st card.
 
-There are 2 AssemblyScript contracts in this project, each in their own folder:
+Game ends with endGame, where the game draws the 2nd random card (value 1 through 14).
+Player wins the pot of money (initial minimum bet + the 2nd Round's high/low choice bet amount, 
+upto the maximum choice bet for that Game "instance"),
+Otherwise - the house gets the funds that were bet - including on any ties
+
+Check Game status after each Round and after endGame with whatIsGameStatus (gameId required)
+ 
+HighLow uses AssemblyScript contracts in this project, in their own folder:
 
 - **simple** in the `src/simple` folder
-- **singleton** in the `src/singleton` folder
 
-### Simple
-
-We say that an AssemblyScript contract is written in the "simple style" when the `index.ts` file (the contract entry point) includes a series of exported functions.
+HighLow's AssemblyScript contract is written via it's `index.ts` file (the contract entry point)
+that includes a series of exported functions.
 
 In this case, all exported functions become public contract methods.
 
 ```ts
-// return the string 'hello world'
-export function helloWorld(): string {}
+// create the HighLow game instance 
+export function createGame(_initBet: u128): u32{}
 
-// read the given key from account (contract) storage
-export function read(key: string): string {}
+// play the first round of HighLow
+export function round1Game(_gameId: u32): bool {}
 
-// write the given value at the given key to account (contract) storage
-export function write(key: string, value: string): string {}
+// play the second round of HighLow, making the second round bet and choosing High or Low
+export function round2Game(_gameId: u32, _choiceHigh: boolean, _betAmount: u128): bool {}
 
-// private helper method used by read() and write() above
-private storageReport(): string {}
+// end (finish) the game instance, determing whether the player or the house wins / pay player on a "win"
+export function endGame(_gameId: u32): string {}
 ```
 
-### Singleton
+HighLow's AssemblyScript also has a single exported class, HighLow that is decorated with `@nearBindgen`.
 
-We say that an AssemblyScript contract is written in the "singleton style" when the `index.ts` file (the contract entry point) has a single exported class (the name of the class doesn't matter) that is decorated with `@nearBindgen`.
-
-In this case, all methods on the class become public contract methods unless marked `private`.  Also, all instance variables are stored as a serialized instance of the class under a special storage key named `STATE`.  AssemblyScript uses JSON for storage serialization (as opposed to Rust contracts which use a custom binary serialization format called borsh).
+All methods on the HighLow class become public contract methods unless marked `private`.  Also, all instance variables are stored as a serialized instance of the class under a special storage key named `STATE`.  AssemblyScript uses JSON for storage serialization (as opposed to Rust contracts which use a custom binary serialization format called borsh).
 
 ```ts
 @nearBindgen
-export class Contract {
+export class HighLow {}
 
-  // return the string 'hello world'
-  helloWorld(): string {}
-
-  // read the given key from account (contract) storage
-  read(key: string): string {}
-
-  // write the given value at the given key to account (contract) storage
-  @mutateState()
-  write(key: string, value: string): string {}
-
-  // private helper method used by read() and write() above
-  private storageReport(): string {}
-}
 ```
-
-
 ## Usage
+
+Play the HighLow game by 1) creating the game 2) playing round 1, then round 2 and then 3) ending the game
+
+You can monitor the status of each step (create game, roune 1, round 2 and end game) via ...
+
+export function whatIsGameStatus(_gameId: u32): string {}
 
 ### Getting started
 
@@ -70,60 +70,23 @@ export class Contract {
 
 1. clone this repo to a local folder
 2. run `yarn`
-3. run `./scripts/1.dev-deploy.sh`
-3. run `./scripts/2.use-contract.sh`
-4. run `./scripts/2.use-contract.sh` (yes, run it to see changes)
+3. run `./scripts/1.dev-deploy.sh`  (which deploys the contract)
+3. run `./scripts/2.use-contract.sh` (ignore)
+4. run `./scripts/2.use-contract.sh` (ignore)
 5. run `./scripts/3.cleanup.sh`
+6. run the following "play" commands from the terminal (found in `./scripts/4.createnrunHL.sh`
 
-### Videos
+near call dev-1636061228659-36397651617537 createGame '{"_initBet":"10"}' --amount 100 --accountId comtechnet.testnet
 
-**`1.dev-deploy.sh`**
+near call dev-1636061228659-36397651617537 round1Game '{"_gameId":1913854565}' --accountId comtechnet.testnet
 
-This video shows the build and deployment of the contract.
+near call dev-1636061228659-36397651617537 round2Game '{"_gameId":1913854565, "_choiceHigh":true, "_betAmount":"20"}' --accountId comtechnet.testnet
 
-[![asciicast](https://asciinema.org/a/409575.svg)](https://asciinema.org/a/409575)
+near call dev-1636061228659-36397651617537 whatIsGameStatus '{"_gameId":1913854565}' --accountId comtechnet.testnet
 
-**`2.use-contract.sh`**
+near call dev-1636061228659-36397651617537 endGame '{"_gameId":1913854565}' --accountId comtechnet.testnet
 
-This video shows contract methods being called.  You should run the script twice to see the effect it has on contract state.
-
-[![asciicast](https://asciinema.org/a/409577.svg)](https://asciinema.org/a/409577)
-
-**`3.cleanup.sh`**
-
-This video shows the cleanup script running.  Make sure you add the `BENEFICIARY` environment variable. The script will remind you if you forget.
-
-```sh
-export BENEFICIARY=<your-account-here>   # this account receives contract account balance
-```
-
-[![asciicast](https://asciinema.org/a/409580.svg)](https://asciinema.org/a/409580)
-
-### Other documentation
-
-- See `./scripts/README.md` for documentation about the scripts
-- Watch this video where Willem Wyndham walks us through refactoring a simple example of a NEAR smart contract written in AssemblyScript
-
-  https://youtu.be/QP7aveSqRPo
-
-  ```
-  There are 2 "styles" of implementing AssemblyScript NEAR contracts:
-  - the contract interface can either be a collection of exported functions
-  - or the contract interface can be the methods of a an exported class
-
-  We call the second style "Singleton" because there is only one instance of the class which is serialized to the blockchain storage.  Rust contracts written for NEAR do this by default with the contract struct.
-
-   0:00 noise (to cut)
-   0:10 Welcome
-   0:59 Create project starting with "npm init"
-   2:20 Customize the project for AssemblyScript development
-   9:25 Import the Counter example and get unit tests passing
-  18:30 Adapt the Counter example to a Singleton style contract
-  21:49 Refactoring unit tests to access the new methods
-  24:45 Review and summary
-  ```
-
-## The file system
+## The HighLow file system only uses the simple directory
 
 ```sh
 ├── README.md                          # this file
