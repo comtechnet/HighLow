@@ -79,6 +79,10 @@ export function whatIsGameStatus(_gameId: u32): string {}
 
 REPLACE contract name with your contract name from ./scripts/1.dev-deploy.sh and REPLACE _gameId with your _gameId from create game
 
+REPLACE --accountId name with your NEAR accountId value (usually a NEAR testnet account)
+
+REPLACE your _betAmount value
+
 near call dev-1636061228659-36397651617537 createGame '{"_initBet":"10"}' --amount 100 --accountId comtechnet.testnet
 
 near call dev-1636061228659-36397651617537 round1Game '{"_gameId":1913854565}' --accountId comtechnet.testnet
