@@ -10,7 +10,8 @@ Game series is funded by the house with X $.
 
 Each series game "play" instance requires a minimum bet amount by the player.
 Game starts with createGame and the required minimum bet.  Game play can be blind.
-Game continues through two rounds and then ends with endGame
+Game continues through two rounds and then ends with endGame.
+
 Round 1 is played as a random card is turned over from the deck "shuttle"
 
 Player then places a Round 2 bet (subject to maximum betting rules) along with a 
