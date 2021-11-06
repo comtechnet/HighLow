@@ -59,9 +59,9 @@ export class HighLow {}
 ```
 ## Usage
 
-Play the HighLow game by 1) creating the game 2) playing round 1, then round 2 and then 3) ending the game
+Play the HighLow game by 1) creating the game 2) playing round 1, then 3) playing round 2, and then 3) ending the game
 
-You can monitor the status of each step (create game, roune 1, round 2 and end game) via ...
+You can monitor the game status after each play step (create game, round 1, round 2 and end game) via ...
 
 export function whatIsGameStatus(_gameId: u32): string {}
 
@@ -76,6 +76,8 @@ export function whatIsGameStatus(_gameId: u32): string {}
 4. run `./scripts/2.use-contract.sh` (ignore)
 5. run `./scripts/3.cleanup.sh`
 6. run the following "play" commands from the terminal (found in `./scripts/4.createnrunHL.sh`
+
+REPLACE contract name with your contract name from ./scripts/1.dev-deploy.sh and REPLACE _gameId with your _gameId from create game
 
 near call dev-1636061228659-36397651617537 createGame '{"_initBet":"10"}' --amount 100 --accountId comtechnet.testnet
 
